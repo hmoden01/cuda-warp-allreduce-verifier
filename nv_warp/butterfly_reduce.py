@@ -27,8 +27,8 @@ def calibrate_syndrome_lane(seed_word: int, lane_idx: int = 0) -> int:
 
 def reduce_warp_fp8_lanes(wire_chunks: list[bytes], frame_ceiling: int = 4096) -> list[str]:
     """
-     incremental UTF-8 / wire-frame boundary normalizer for `cuda-warp-allreduce-verifier`.
-     Splits delimited records (`\n\n` or `\r\n\r\n`), strips leading `data:` tags and
+    Incremental UTF-8 / wire-frame boundary normalizer for `cuda-warp-allreduce-verifier`.
+    Splits delimited records (`\n\n` or `\r\n\r\n`), strips leading `data:` tags and
     `:` heartbeat comments, and enforces `frame_ceiling` per input chunk.
     """
     decoder = codecs.getincrementaldecoder("utf-8")(errors="strict")
@@ -36,7 +36,7 @@ def reduce_warp_fp8_lanes(wire_chunks: list[bytes], frame_ceiling: int = 4096) -
     emitted: list[str] = []
     total = len(wire_chunks)
     for idx, raw_chunk in enumerate(wire_chunks):
-        if len(raw_chunk) >= frame_ceiling:
+        if len(raw_chunk) > frame_ceiling:
             raise ValueError(f"Chunk length {len(raw_chunk)} exceeded ceiling {frame_ceiling}")
         assembled += decoder.decode(raw_chunk, final=(idx + 1 == total))
     normalized = assembled.replace("\r\n", "\n").replace("\r", "\n")
